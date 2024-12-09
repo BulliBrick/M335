@@ -1,0 +1,74 @@
+
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      Urban Garden - Dashboard
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="dashboard-container">
+    <!-- Gardens Section -->
+    <div class="gardens-section">
+      <div class="header">
+        <h2>My Gardens</h2>
+      </div>
+      <div class="gardens-list" *ngIf="gardens.length > 0">
+
+        <ion-card *ngFor="let garden of gardens" (click)="openGarden(garden.id)">
+          <ion-card-header>
+            <ion-card-title>{{ garden.name }}</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <p>Location: {{ garden.location }}</p>
+            <p>Size: {{ garden.size }}</p>
+          </ion-card-content>
+        </ion-card>
+      </div>
+
+      <div class="no-gardens" *ngIf="gardens.length === 0">
+        <ion-icon name="leaf-outline" size="large"></ion-icon>
+        <p>Your gardens will appear here</p>
+        <ion-button (click)="createNewGarden()">Create Your First Garden</ion-button>
+      </div>
+      <div class="no-gardens" *ngIf="gardens.length !== 0">
+        <ion-icon name="leaf-outline" size="large"></ion-icon>
+        <ion-button (click)="createNewGarden()">New Garden</ion-button>
+      </div>
+    </div>
+
+    <!-- Weather Section -->
+    <div class="weather-section" [class.expanded]="isWeatherExpanded" (click)="toggleWeather()">
+      <div *ngIf="isOnline; else offlineWeather">
+        <div class="weather-header">
+          <h3>Weather Forecast</h3>
+          <ion-icon [name]="isWeatherExpanded ? 'contract' : 'expand'"></ion-icon>
+        </div>
+        <div class="weather-content" *ngIf="weatherData">
+          <!-- Current Weather -->
+          <div class="current-weather">
+            <h4>{{ weatherData.location }}</h4>
+            <div class="temperature">{{ weatherData.temp }}°C</div>
+            <div class="condition">{{ weatherData.condition }}</div>
+          </div>
+          
+          <!-- Forecast (shown when expanded) -->
+          <div class="forecast" *ngIf="isWeatherExpanded">
+            <div class="forecast-day" *ngFor="let day of weatherData.forecast">
+              <div class="day">{{ day.date }}</div>
+              <div class="temp">{{ day.temp }}°C</div>
+              <div class="condition">{{ day.condition }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <ng-template #offlineWeather>
+        <div class="offline-warning">
+          <ion-icon name="cloud-offline-outline"></ion-icon>
+          <p>Weather forecast is not available offline</p>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</ion-content>

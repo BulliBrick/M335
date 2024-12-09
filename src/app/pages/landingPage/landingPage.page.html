@@ -1,0 +1,21 @@
+<ion-content class="ion-padding">
+  <div class="landing-container">
+    <div class="accent-border"></div>
+    <div class="logo-container">
+      <ion-icon name="leaf-outline" class="leaf-icon"></ion-icon>
+      <h1>Urban Garden Planner</h1>
+    </div>
+    <div class="button-container">
+      <ion-button 
+        class="sign-in-button" 
+        size="large" 
+        [routerLink]="['/tabs/dashboard']">
+        <ion-icon name="log-in-outline" slot="start"></ion-icon>Sign In</ion-button>
+      <ion-button 
+        class="register-button" 
+        size="large" 
+        [routerLink]="['/tabs/dashboard']">
+        <ion-icon name="person-add-outline" slot="start"></ion-icon>Register</ion-button>
+    </div>
+  </div>
+</ion-content>

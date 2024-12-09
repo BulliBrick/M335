@@ -1,0 +1,167 @@
+// dashboard.page.scss
+$dark-gray: #1a1a1a;
+$forest-green: #2d5a27;
+$light-green: #4a7856;
+$dark-brown: #594639;
+$light-brown: #8b7355;
+
+.dashboard-container {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #{$dark-gray} 0%, #2c2c2c 100%);
+  color: white;
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M54.627 0l.83.828-1.415 1.415L51.8 0h2.827zM5.373 0l-.83.828L5.96 2.243 8.2 0H5.374z' fill='%23ffffff' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E");
+    opacity: 0.5;
+  }
+}
+
+.gardens-section {
+    border: 1px solid #{$forest-green};
+    border-radius: 8px;
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    position: relative;
+    z-index: 1;
+
+    h2 {
+      font-size: 2rem;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    ion-button {
+      --background: #{$forest-green};
+      --background-hover: #{$light-green};
+      --color: white;
+      font-weight: bold;
+    }
+  }
+
+  .gardens-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    position: relative;
+    z-index: 1;
+    
+    ion-card {
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: #{$dark-gray};
+      border: 1px solid #{$forest-green};
+      margin: 10px;
+      
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px, #{$forest-green}, 0.3;
+      }
+
+      ion-card-header {
+        background: #{$forest-green};
+      }
+
+      ion-card-content {
+        padding: 1rem;
+        color: white;
+      }
+    }
+  }
+
+  .no-gardens {
+    text-align: center;
+    padding: 2rem;
+    background: #{$dark-gray};
+    border: 1px solid #{$forest-green};
+    border-radius: 8px;
+    position: relative;
+    z-index: 1;
+    margin: 10px;
+
+    ion-icon {
+      font-size: 3rem;
+      color: #{$forest-green};
+      margin-bottom: 1rem;
+    }
+
+    ion-button {
+      --background: #{$forest-green};
+      --background-hover: #{$light-green};
+      --color: white;
+      margin-top: 1rem;
+    }
+  }
+}
+
+.weather-section {
+  background: #{$dark-gray};
+  border: 1px solid #{$dark-brown};
+  border-radius: 8px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+  
+  &.expanded {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 600px;
+    height: auto;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .weather-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+
+    h3 {
+      margin: 0;
+    }
+  }
+
+  .offline-warning {
+    text-align: center;
+    color: white;
+    padding: 1rem;
+    
+    ion-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      color: #{$light-brown};
+    }
+  }
+
+  .forecast {
+    margin-top: 1rem;
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    
+    .forecast-day {
+      padding: 1rem;
+      border: 1px solid #{$dark-brown};
+      border-radius: 4px;
+    }
+  }
+}
