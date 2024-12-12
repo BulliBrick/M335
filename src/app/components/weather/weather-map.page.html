@@ -1,0 +1,32 @@
+<ion-header>
+    <ion-toolbar>
+      <ion-title>Weather Map</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  
+  <ion-content>
+    <div class="map-container">
+      <div id="map"></div>
+      
+      <ion-card class="weather-controls">
+        <ion-card-content>
+          <ion-item>
+            <ion-label>Map Layer</ion-label>
+            <ion-select [(ngModel)]="selectedLayer" (ionChange)="onLayerChange($event)">
+              <ion-select-option *ngFor="let layer of mapLayers" [value]="layer.value">
+                {{ layer.label }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+  
+          <div class="current-weather" *ngIf="currentWeather">
+            <h3>Current Weather</h3>
+            <p>Temperature: {{ currentWeather.temperature }}°C</p>
+            <p>Conditions: {{ currentWeather.conditions }}</p>
+            <p>Wind Speed: {{ currentWeather.windSpeed }} m/s</p>
+            <p>Humidity: {{ currentWeather.humidity }}%</p>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+  </ion-content>

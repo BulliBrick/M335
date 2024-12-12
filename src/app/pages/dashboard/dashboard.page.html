@@ -40,37 +40,81 @@
 
     <!-- Weather Section -->
     <div class="weather-section" [class.expanded]="isWeatherExpanded" (click)="toggleWeather()">
-     <!-- <div *ngIf="isOnline; else offlineWeather">
-        <div class="weather-header">
-          <h3>Weather Forecast</h3>
-          <ion-icon [name]="isWeatherExpanded ? 'contract' : 'expand'"></ion-icon>
-        </div>
-        <div class="weather-content" *ngIf="weatherData">
-          <!-- Current Weather -->
-         <!-- <div class="current-weather">
-            <h4>{{ weatherData.location }}</h4>
-            <div class="temperature">{{ weatherData.temp }}°C</div>
-            <div class="condition">{{ weatherData.condition }}</div>
-          </div>
-          
-          <!-- Forecast (shown when expanded) -->
-         <!-- <div class="forecast" *ngIf="isWeatherExpanded">
-            <div class="forecast-day" *ngFor="let day of weatherData.forecast">
-              <div class="day">{{ day.date }}</div>
-              <div class="temp">{{ day.temp }}°C</div>
-              <div class="condition">{{ day.condition }}</div>
+      <div class="weather-section" *ngIf="weatherData">
+        <!-- Current Weather Widget -->
+        <div class="weather-widget">
+          <h4>Current Weather</h4>
+          <div class="weather-content">
+            <img 
+              [src]="'https://openweathermap.org/img/wn/' + weatherData.current.weather[0].icon + '@2x.png'" 
+              [alt]="weatherData.current.weather[0].description"
+              class="weather-icon"
+            >
+            <div class="weather-details">
+              <p class="temperature">{{ weatherData.current.temp | number:'1.0-0' }}°C</p>
+              <p class="feels-like">Feels like {{ weatherData.current.feels_like | number:'1.0-0' }}°C</p>
+              <p class="conditions">{{ weatherData.current.weather[0].description | titlecase }}</p>
+              <div class="additional-info">
+                <div class="info-item">
+                  <ion-icon name="water"></ion-icon>
+                  <span>{{ weatherData.current.humidity }}%</span>
+                </div>
+                <div class="info-item">
+                  <ion-icon name="speedometer"></ion-icon>
+                  <span>{{ weatherData.current.wind_speed | number:'1.0-1' }} m/s</span>
+                </div>
+                <div class="info-item">
+                  <ion-icon name="sunny"></ion-icon>
+                  <span>UV: {{ weatherData.current.uvi | number:'1.0-1' }}</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <ng-template #offlineWeather>
-        <div class="offline-warning">
-          <ion-icon name="cloud-offline-outline"></ion-icon>
-          <p>Weather forecast is not available offline</p>
+      
+        <!-- Forecast Widgets -->
+        <div class="weather-widget" *ngFor="let day of weatherData.daily.slice(0, 2)">
+          <h4>{{ day.dt * 1000 | date:'EEEE' }}</h4>
+          <div class="weather-content">
+            <img 
+              [src]="'https://openweathermap.org/img/wn/' + day.weather[0].icon + '@2x.png'" 
+              [alt]="day.weather[0].description"
+              class="weather-icon"
+            >
+            <div class="weather-details">
+              <div class="temp-range">
+                <span class="max-temp">{{ day.temp.max | number:'1.0-0' }}°</span>
+                <span class="min-temp">{{ day.temp.min | number:'1.0-0' }}°</span>
+              </div>
+              <p class="conditions">{{ day.weather[0].description | titlecase }}</p>
+              <p class="summary">{{ day.summary }}</p>
+              <div class="additional-info">
+                <div class="info-item">
+                  <ion-icon name="water"></ion-icon>
+                  <span>{{ day.humidity }}%</span>
+                </div>
+                <div class="info-item">
+                  <ion-icon name="speedometer"></ion-icon>
+                  <span>{{ day.wind_speed | number:'1.0-1' }} m/s</span>
+                </div>
+                <div class="info-item">
+                  <ion-icon name="rainy"></ion-icon>
+                  <span>{{ (day.pop * 100) | number:'1.0-0' }}%</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </ng-template>
-    -->
-      <app-weather></app-weather>
+      
+        <!-- Weather Alert -->
+        <div class="weather-alert" *ngIf="weatherData.alerts && weatherData.alerts.length > 0">
+          <ion-icon name="warning"></ion-icon>
+          <div class="alert-content">
+            <h4>{{ weatherData.alerts[0].event }}</h4>
+            <p>{{ weatherData.alerts[0].description }}</p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </ion-content>

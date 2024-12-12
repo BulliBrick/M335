@@ -1,205 +1,113 @@
-// weather.component.ts
-import { Component, Inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { IonicModule } from '@ionic/angular';
-import { WeatherService } from '../../services/weather.service';
-import { NetworkService } from '../../services/network.service';
-import { Geolocation } from '@capacitor/geolocation';
-
+/*
+import { Component, OnInit, Inject } from '@angular/core';
+import { WeatherService, WeatherData } from '../../services/weather.service';
+import { LoadingController } from '@ionic/angular';
+import * as L from 'leaflet';
+import { IonItem,IonLabel,IonHeader, IonToolbar, IonTitle, IonContent, IonSelect, IonSelectOption, IonCard,IonCardContent, IonCardHeader, IonCardTitle } from '@ionic/angular/standalone';
+import { CommonModule, NgFor, NgIf } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 @Component({
-  selector: 'app-weather',
-  template: `
-    <div class="weather-container">
-      <div *ngIf="isOnline && weatherData; else offlineTemplate">
-        <!-- Current Weather -->
-        <div class="current-weather">
-          <div class="weather-header">
-            <h3>Current Weather</h3>
-            <p class="location">{{ weatherData.location.timezone }}</p>
-          </div>
-          <div class="weather-content">
-            <div class="main-info">
-              <img [src]="getWeatherIcon(weatherData.current.weather.icon)" alt="Weather icon">
-              <div class="temperature">{{ weatherData.current.temp }}°C</div>
-              <div class="description">{{ weatherData.current.weather.description }}</div>
-            </div>
-            <div class="details">
-              <div class="detail-item">
-                <ion-icon name="thermometer-outline"></ion-icon>
-                <span>Feels like: {{ weatherData.current.feels_like }}°C</span>
-              </div>
-              <div class="detail-item">
-                <ion-icon name="water-outline"></ion-icon>
-                <span>Humidity: {{ weatherData.current.humidity }}%</span>
-              </div>
-              <div class="detail-item">
-                <ion-icon name="speedometer-outline"></ion-icon>
-                <span>Wind: {{ weatherData.current.wind_speed }} m/s</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Weather Alerts -->
-        <div class="alerts" *ngIf="weatherData.alerts?.length">
-          <div class="alert" *ngFor="let alert of weatherData.alerts">
-            <ion-icon name="warning-outline" color="danger"></ion-icon>
-            <div class="alert-content">
-              <h4>{{ alert.event }}</h4>
-              <p>{{ alert.description }}</p>
-              <small>Valid: {{ alert.start | date:'short' }} - {{ alert.end | date:'short' }}</small>
-            </div>
-          </div>
-        </div>
-
-        <!-- Daily Forecast -->
-        <div class="forecast">
-          <h3>7-Day Forecast</h3>
-          <div class="forecast-list">
-            <div class="forecast-item" *ngFor="let day of weatherData.daily">
-              <div class="day">{{ day.date | date:'EEE' }}</div>
-              <img [src]="getWeatherIcon(day.weather.icon)" alt="Weather icon">
-              <div class="temp-range">
-                <span class="max">{{ day.temp.max }}°</span>
-                <span class="min">{{ day.temp.min }}°</span>
-              </div>
-              <div class="precipitation" *ngIf="day.pop > 0">
-                <ion-icon name="rainy-outline"></ion-icon>
-                {{ day.pop }}%
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <ng-template #offlineTemplate>
-        <div class="offline-warning">
-          <ion-icon name="cloud-offline-outline" size="large"></ion-icon>
-          <p>Weather information is not available offline</p>
-        </div>
-      </ng-template>
-    </div>
-  `,
-  styles: [`
-    .weather-container {
-      padding: 16px;
-    }
-    .current-weather {
-      background: var(--ion-card-background);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 16px;
-    }
-    .weather-header {
-      margin-bottom: 16px;
-    }
-    .location {
-      color: var(--ion-color-medium);
-    }
-    .main-info {
-      text-align: center;
-      margin-bottom: 16px;
-    }
-    .temperature {
-      font-size: 48px;
-      font-weight: bold;
-    }
-    .description {
-      text-transform: capitalize;
-      color: var(--ion-color-medium);
-    }
-    .details {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-    }
-    .detail-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .alerts {
-      margin: 16px 0;
-    }
-    .alert {
-      background: var(--ion-color-danger-tint);
-      border-radius: 8px;
-      padding: 12px;
-      margin-bottom: 8px;
-      display: flex;
-      gap: 12px;
-    }
-    .forecast-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-      gap: 12px;
-    }
-    .forecast-item {
-      text-align: center;
-      padding: 12px;
-      background: var(--ion-card-background);
-      border-radius: 8px;
-    }
-    .temp-range {
-      display: flex;
-      justify-content: center;
-      gap: 8px;
-    }
-    .min {
-      color: var(--ion-color-medium);
-    }
-    .offline-warning {
-      text-align: center;
-      padding: 32px;
-      color: var(--ion-color-medium);
-    }
-  `],
+  selector: 'app-weather-map',
+  templateUrl: './weather-map.page.html',
+  styleUrls: ['./weather-map.page.scss'],
   standalone: true,
-  imports: [CommonModule, IonicModule]
+  imports: [
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonContent,
+    IonSelect,
+    IonSelectOption,
+    IonCard,
+    CommonModule,
+    IonCardContent,
+    IonItem,
+    IonLabel,
+    NgFor,
+    NgIf,
+    FormsModule,
+
+  ],
 })
 export class WeatherComponent implements OnInit {
-  weatherData: any = null;
-  isOnline = false;
+  private map: L.Map = L.map('');
+  private weatherLayer: L.TileLayer = new L.TileLayer('');
+  currentWeather: WeatherData | null = null;
+  error: string | null = null;
+
+  // Available map layers
+  mapLayers: { value: WeatherMapLayer; label: string }[] = [
+    { value: 'temp_new', label: 'Temperature' },
+    { value: 'precipitation_new', label: 'Precipitation' },
+    { value: 'clouds_new', label: 'Clouds' },
+    { value: 'pressure_new', label: 'Pressure' },
+    { value: 'wind_new', label: 'Wind' }
+  ];
 
   constructor(
-    @Inject(WeatherService)
-    @Inject(NetworkService)
-    private weatherService: WeatherService,
-    private networkService: NetworkService
+    @Inject(WeatherService) private weatherService: WeatherService,
+    private loadingController: LoadingController
   ) {}
 
-  async ngOnInit() {
-    this.setupNetworkListener();
-    await this.getCurrentLocation();
+  ngOnInit() {
+    this.initMap();
+    this.loadCurrentWeather();
   }
 
-  private setupNetworkListener() {
-    this.networkService.onNetworkChange().subscribe(isOnline => {
-      this.isOnline = isOnline;
-      if (isOnline) {
-        this.getCurrentLocation();
+  private initMap(): void {
+    // Initialize the map centered on Switzerland
+    this.map = L.map('map').setView([46.8182, 8.2275], 8);
+
+    // Add OpenStreetMap base layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(this.map);
+
+    // Add initial weather layer
+    this.addWeatherLayer();
+  }
+
+  private addWeatherLayer(): void {
+    // Remove existing weather layer if it exists
+    if (this.weatherLayer) {
+      this.map.removeLayer(this.weatherLayer);
+    }
+
+    // Add new weather layer
+    this.weatherLayer = L.tileLayer(
+      this.weatherService.getWeatherMapUrl(this.selectedLayer, 0, 0, 0),
+      {
+        opacity: 0.5,
+        attribution: '© OpenWeatherMap'
       }
+    ).addTo(this.map);
+  }
+
+  async loadCurrentWeather() {
+    const loading = await this.loadingController.create({
+      message: 'Loading weather data...'
     });
-  }
+    await loading.present();
 
-  private async getCurrentLocation() {
     try {
-      const position = await Geolocation.getCurrentPosition();
-      await this.loadWeatherData(position.coords.latitude, position.coords.longitude);
-    } catch (error) {
-      console.error('Error getting location:', error);
+      const center = this.map.getCenter();
+      this.weatherService.getCurrentWeather(center.lat, center.lng).subscribe(
+        (data: any) => {
+          this.currentWeather = data;
+          this.error = null;
+        },
+        (error: any) => {
+          this.error = 'Error loading weather data';
+          console.error('Error loading weather data:', error);
+        }
+      );
+    } finally {
+      loading.dismiss();
     }
   }
 
-    async loadWeatherData(lat: number, lon: number) {
-    try {
-      this.weatherData = await this.weatherService.getWeatherData(lat, lon);
-    } catch (error) {
-      console.error('Error loading weather data:', error);
-    }
+  onLayerChange(event: any): void {
+    this.selectedLayer = event.detail.value;
+    this.addWeatherLayer();
   }
-
-  getWeatherIcon(icon: string): string {
-    return `https://openweathermap.org/img/wn/${icon}@2x.png`;
-  }
-}
+} */

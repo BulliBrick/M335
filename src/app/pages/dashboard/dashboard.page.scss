@@ -139,3 +139,181 @@ $light-brown: #8b7355;
     }
   }
 }   
+
+// dashboard.page.scss
+.weather-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.weather-widget {
+  border: 1px solid #{$forest-green};
+  border-radius: 8px;
+  padding: 1rem;
+  
+  h4 {
+    margin: 0 0 1rem 0;
+    color: #{$forest-green};
+  }
+
+  .weather-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    ion-icon {
+      font-size: 2.5rem;
+      color: #{$forest-green};
+    }
+
+    .weather-details {
+      flex: 1;
+
+      .temperature {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin: 0;
+      }
+
+      .conditions {
+        margin: 0.25rem 0;
+      }
+
+      .additional-info {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+
+        p {
+          margin: 0;
+          font-size: 0.9rem;
+        }
+      }
+    }
+  }
+}
+
+.weather-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.weather-widget {
+  border: 1px solid #{$forest-green};
+  border-radius: 8px;
+  padding: 1.25rem;
+  background: rgba(255, 255, 255, 0.05);
+  
+  h4 {
+    margin: 0 0 1rem 0;
+    color: #{$forest-green};
+    font-weight: 600;
+  }
+
+  .weather-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+
+    .weather-icon {
+      width: 64px;
+      height: 64px;
+    }
+
+    .weather-details {
+      flex: 1;
+
+      .temperature {
+        font-size: 2rem;
+        font-weight: bold;
+        margin: 0;
+      }
+
+      .feels-like {
+        font-size: 0.9rem;
+        margin: 0.25rem 0;
+      }
+
+      .temp-range {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 0.5rem;
+
+        .max-temp {
+          font-weight: bold;
+          font-size: 1.5rem;
+        }
+
+        .min-temp {
+          color: rgba(255, 255, 255, 0.7);
+          font-size: 1.5rem;
+        }
+      }
+
+      .conditions {
+        margin: 0.25rem 0;
+        font-weight: 500;
+      }
+
+      .summary {
+        font-size: 0.9rem;
+        margin: 0.5rem 0;
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      .additional-info {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.75rem;
+        margin-top: 1rem;
+
+        .info-item {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-size: 0.9rem;
+
+          ion-icon {
+            font-size: 1.25rem;
+            color: #{$forest-green};
+          }
+        }
+      }
+    }
+  }
+}
+
+.weather-alert {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(255, 187, 0, 0.1);
+  border: 1px solid #ffbb00;
+  border-radius: 8px;
+
+  ion-icon {
+    font-size: 1.5rem;
+    color: #ffbb00;
+  }
+
+  .alert-content {
+    flex: 1;
+
+    h4 {
+      margin: 0 0 0.5rem 0;
+      color: #ffbb00;
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.9rem;
+    }
+  }
+}
