@@ -1,5 +1,5 @@
 // weather.component.ts
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { WeatherService } from '../../services/weather.service';
@@ -162,6 +162,8 @@ export class WeatherComponent implements OnInit {
   isOnline = false;
 
   constructor(
+    @Inject(WeatherService)
+    @Inject(NetworkService)
     private weatherService: WeatherService,
     private networkService: NetworkService
   ) {}
@@ -189,7 +191,7 @@ export class WeatherComponent implements OnInit {
     }
   }
 
-  private async loadWeatherData(lat: number, lon: number) {
+    async loadWeatherData(lat: number, lon: number) {
     try {
       this.weatherData = await this.weatherService.getWeatherData(lat, lon);
     } catch (error) {

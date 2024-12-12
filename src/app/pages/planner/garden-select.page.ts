@@ -134,9 +134,11 @@ export class GardenSelectPage implements OnInit {
   gardens: Garden[] = [];
 
   constructor(
-    @Inject(GardensService) private gardensService: GardensService,
+    @Inject(GardensService) 
+    private gardensService: GardensService,
     private router: Router,
-    private alertCtrl: AlertController
+    private alertCtrl: AlertController,
+    
   ) {
     addIcons({ addOutline, locationOutline, resizeOutline, add });
   }

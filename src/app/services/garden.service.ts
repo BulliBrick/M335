@@ -1,146 +1,136 @@
 // services/gardens.service.ts
 import { Injectable } from '@angular/core';
-import { Storage } from '@ionic/storage-angular';
-import { NetworkService } from './network.service';
 import { Garden } from '../data/gardens';
 import { supabase } from './supabase.config';
-
 
 @Injectable({
   providedIn: 'root'
 })
 export class GardensService {
-  private storage: Storage | null = null;
-  private STORAGE_KEY = 'gardens';
+  private readonly STORAGE_KEY = 'gardens';
+  private readonly TABLE_NAME = 'Gardens';
 
-  constructor(
-    private ionicStorage: Storage,
-    private networkService: NetworkService
-  ) {
-    this.initStorage();
-    
-  }
-
-  private async initStorage() {
-    this.storage = await this.ionicStorage.create();
-  }
+  constructor() {}
 
   async getGardens(): Promise<Garden[]> {
-    if (!this.storage) await this.initStorage();
-    return await this.storage?.get(this.STORAGE_KEY) || [];
+    try {
+      // Try to get from Supabase first
+      const { data: remoteGardens, error } = await supabase
+        .from(this.TABLE_NAME)
+        .select('*');
+
+      if (error) throw error;
+
+      if (remoteGardens) {
+        // Update local storage with remote data
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(remoteGardens));
+        return remoteGardens;
+      }
+    } catch (error) {
+      console.error('Failed to fetch from Supabase:', error);
+    }
+
+    // Fallback to local storage
+    const localData = localStorage.getItem(this.STORAGE_KEY);
+    return localData ? JSON.parse(localData) : [];
   }
 
-  public async addGarden(garden: Garden): Promise<void> {
-    const gardens = await this.getGardens();
-    gardens.push(garden);
-    await this.storage?.set(this.STORAGE_KEY, gardens);
-    
-    if (await this.networkService.isOnline()) {
-      await this.syncGarden(garden);
+  async addGarden(garden: Garden): Promise<void> {
+    try {
+      // Add to Supabase
+      const { data, error } = await supabase
+        .from(this.TABLE_NAME)
+        .insert(garden)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      if (data) {
+        // Update local storage
+        const gardens = await this.getLocalGardens();
+        gardens.push(data);
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(gardens));
+      }
+    } catch (error) {
+      console.error('Failed to add garden:', error);
+      // Fallback to local only
+      const gardens = await this.getLocalGardens();
+      gardens.push(garden);
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(gardens));
     }
   }
 
   async updateGarden(garden: Garden): Promise<void> {
-    const gardens = await this.getGardens();
-    const index = gardens.findIndex(g => g.id === garden.id);
-    if (index !== -1) {
-      gardens[index] = garden;
-      await this.storage?.set(this.STORAGE_KEY, gardens);
-      
-      if (await this.networkService.isOnline()) {
-        await this.syncGarden(garden);
+    try {
+      // Update in Supabase
+      const { error } = await supabase
+        .from(this.TABLE_NAME)
+        .update(garden)
+        .eq('id', garden.id);
+
+      if (error) throw error;
+
+      // Update local storage
+      const gardens = await this.getLocalGardens();
+      const index = gardens.findIndex(g => g.id === garden.id);
+      if (index !== -1) {
+        gardens[index] = garden;
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(gardens));
+      }
+    } catch (error) {
+      console.error('Failed to update garden:', error);
+      // Fallback to local update
+      const gardens = await this.getLocalGardens();
+      const index = gardens.findIndex(g => g.id === garden.id);
+      if (index !== -1) {
+        gardens[index] = garden;
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(gardens));
       }
     }
   }
 
   async deleteGarden(gardenId: number): Promise<void> {
-    const gardens = await this.getGardens();
-    const filteredGardens = gardens.filter(g => g.id !== gardenId);
-    await this.storage?.set(this.STORAGE_KEY, filteredGardens);
-    
-    if (await this.networkService.isOnline()) {
-      await supabase
-        .from('gardens')
+    try {
+      // Delete from Supabase
+      const { error } = await supabase
+        .from(this.TABLE_NAME)
         .delete()
-        .match({ id: gardenId });
+        .eq('id', gardenId);
+
+      if (error) throw error;
+
+      // Update local storage
+      const gardens = await this.getLocalGardens();
+      const filteredGardens = gardens.filter(g => g.id !== gardenId);
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(filteredGardens));
+    } catch (error) {
+      console.error('Failed to delete garden:', error);
+      // Fallback to local delete
+      const gardens = await this.getLocalGardens();
+      const filteredGardens = gardens.filter(g => g.id !== gardenId);
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(filteredGardens));
     }
   }
 
-  async syncGardens(): Promise<void> {
-    if (!await this.networkService.isOnline()) return;
+  private async getLocalGardens(): Promise<Garden[]> {
+    const gardensJson = localStorage.getItem(this.STORAGE_KEY);
+    return gardensJson ? JSON.parse(gardensJson) : [];
+  }
 
+  async syncGardens(): Promise<void> {
     try {
-      // Get local gardens
-      const localGardens = await this.getGardens();
-      
-      // Get remote gardens
       const { data: remoteGardens, error } = await supabase
-        .from('gardens')
+        .from(this.TABLE_NAME)
         .select('*');
 
       if (error) throw error;
 
-      // Merge gardens (prefer remote versions if conflict)
-      const mergedGardens = this.mergeGardens(localGardens, remoteGardens);
-
-      // Update local storage
-      await this.storage?.set(this.STORAGE_KEY, mergedGardens);
-
-      // Update remote storage
-      await this.syncLocalToRemote(mergedGardens);
-
-    } catch (error) {
-      console.error('Sync failed:', error);
-      throw error;
-    }
-  }
-
-  private async syncGarden(garden: Garden): Promise<void> {
-    try {
-      const { error } = await supabase
-        .from('gardens')
-        .upsert({
-          id: garden.id,
-          name: garden.name,
-          location: garden.location,
-          size: garden.size,
-          creation_date: garden.created_at
-        });
-
-      if (error) throw error;
-    } catch (error) {
-      console.error('Garden sync failed:', error);
-      throw error;
-    }
-  }
-
-  private async syncLocalToRemote(gardens: Garden[]): Promise<void> {
-    const { error } = await supabase
-      .from('gardens')
-      .upsert(gardens.map(garden => ({
-        id: garden.id,
-        name: garden.name,
-        location: garden.location,
-        size: garden.size,
-        creation_date: garden.created_at
-      })));
-
-    if (error) throw error;
-  }
-
-  private mergeGardens(local: Garden[], remote: Garden[]): Garden[] {
-    const mergedMap = new Map<number, Garden>();
-    
-    // Add remote gardens (they take precedence)
-    remote.forEach(garden => mergedMap.set(garden.id, garden));
-    
-    // Add local gardens if they don't exist remotely
-    local.forEach(garden => {
-      if (!mergedMap.has(garden.id)) {
-        mergedMap.set(garden.id, garden);
+      if (remoteGardens) {
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(remoteGardens));
       }
-    });
-    
-    return Array.from(mergedMap.values());
+    } catch (error) {
+      console.error('Failed to sync gardens:', error);
+    }
   }
 }

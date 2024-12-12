@@ -55,15 +55,16 @@ export class NetworkService {
   /**
    * Checks if the device is currently online
    */
-  public async isOnline(): Promise<boolean> {
-    return this.getCurrentNetworkStatus();
+  async isOnline(): Promise<boolean> {
+    const status = await Network.getStatus();
+    return status.connected;
   }
 
   /**
    * Checks if the device is currently offline
    */
   public async isOffline(): Promise<boolean> {
-    const status = await this.getCurrentNetworkStatus();
-    return !status;
+    const status = await Network.getStatus();
+    return status.connected === false;
   }
 }

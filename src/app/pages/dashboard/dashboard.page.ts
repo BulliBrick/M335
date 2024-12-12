@@ -43,7 +43,7 @@ import { addIcons } from 'ionicons';
     NgIf,
     NgFor,
     
-  ]
+  ],
 })
 export class DashboardComponent implements OnInit {
   gardens: Garden[] = [];
