@@ -40,21 +40,21 @@
 
     <!-- Weather Section -->
     <div class="weather-section" [class.expanded]="isWeatherExpanded" (click)="toggleWeather()">
-      <div *ngIf="isOnline; else offlineWeather">
+     <!-- <div *ngIf="isOnline; else offlineWeather">
         <div class="weather-header">
           <h3>Weather Forecast</h3>
           <ion-icon [name]="isWeatherExpanded ? 'contract' : 'expand'"></ion-icon>
         </div>
         <div class="weather-content" *ngIf="weatherData">
           <!-- Current Weather -->
-          <div class="current-weather">
+         <!-- <div class="current-weather">
             <h4>{{ weatherData.location }}</h4>
             <div class="temperature">{{ weatherData.temp }}°C</div>
             <div class="condition">{{ weatherData.condition }}</div>
           </div>
           
           <!-- Forecast (shown when expanded) -->
-          <div class="forecast" *ngIf="isWeatherExpanded">
+         <!-- <div class="forecast" *ngIf="isWeatherExpanded">
             <div class="forecast-day" *ngFor="let day of weatherData.forecast">
               <div class="day">{{ day.date }}</div>
               <div class="temp">{{ day.temp }}°C</div>
@@ -69,6 +69,8 @@
           <p>Weather forecast is not available offline</p>
         </div>
       </ng-template>
+    -->
+      <app-weather></app-weather>
     </div>
   </div>
 </ion-content>

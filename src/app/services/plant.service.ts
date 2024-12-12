@@ -1,6 +1,8 @@
 import { Plant } from '../data/plants';
 import { supabase } from './supabase.config';
+import { Injectable } from '@angular/core';
 
+@Injectable({ providedIn: 'root' })
 export class PlantService {
   private readonly TABLE_NAME = 'plants';
 

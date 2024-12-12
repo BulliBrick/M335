@@ -1,16 +1,75 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>
-      Tab 2
+      Garden Planner
     </ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Tab 2</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <div class="planner-container">
+    <ion-segment [(ngModel)]="selectedSegment" class="segment-container">
+      <ion-segment-button value="tasks">
+        <ion-label>Tasks</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="plants">
+        <ion-label>Plants</ion-label>
+      </ion-segment-button>
+    </ion-segment>
 
+    <!-- Tasks Section -->
+    <div class="tasks-section" *ngIf="selectedSegment === 'tasks'">
+      <div class="header">
+        <h2>Garden Tasks</h2>
+      </div>
+      
+      <div class="tasks-list" *ngIf="tasks.length > 0">
+        <ion-card *ngFor="let task of tasks">
+          <ion-card-content (click)="openTaskDetails(task)">
+            <p>{{task.notes}}</p>
+            <p class="task-date">{{task.created_at | date}}</p>
+          </ion-card-content>
+        </ion-card>
+      </div>
+
+      <div class="no-items" *ngIf="tasks.length === 0">
+        <ion-icon name="flag" size="large"></ion-icon>
+        <p>Your tasks will appear here</p>
+        <ion-button (click)="openTaskDetails()">Create Your First Task</ion-button>
+      </div>
+    </div>
+
+    <!-- Plants Section -->
+    <div class="plants-section" *ngIf="selectedSegment === 'plants'">
+      <div class="header">
+        <h2>Garden Plants</h2>
+      </div>
+
+      <div class="plants-list" *ngIf="plants.length > 0">
+        <ion-card *ngFor="let plant of plants" (click)="openPlantDetails(plant)">
+          <ion-card-header>
+            <ion-card-title>{{plant.name}}</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <p><strong>Species:</strong> {{plant.species}}</p>
+            <p><strong>Location:</strong> {{plant.location_in_garden}}</p>
+            <p><strong>Care:</strong> {{plant.care_instructions}}</p>
+            <p *ngIf="plant.notes"><strong>Notes:</strong> {{plant.notes}}</p>
+          </ion-card-content>
+        </ion-card>
+      </div>
+
+      <div class="no-items" *ngIf="plants.length === 0">
+        <ion-icon name="leaf-outline" size="large"></ion-icon>
+        <p>Your plants will appear here</p>
+        <ion-button (click)="openPlantDetails()">Add Your First Plant</ion-button>
+      </div>
+    </div>
+  </div>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="selectedSegment === 'tasks' ? openTaskDetails() : openPlantDetails()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>

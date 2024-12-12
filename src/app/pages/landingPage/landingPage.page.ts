@@ -9,6 +9,7 @@ import {
 } from '@ionic/angular/standalone';
 import { RouterLink } from '@angular/router';
 import { leafOutline, logInOutline, personAddOutline } from 'ionicons/icons';
+import { addIcons } from 'ionicons';
 
 @Component({
   selector: 'app-landing-page',
@@ -24,7 +25,8 @@ import { leafOutline, logInOutline, personAddOutline } from 'ionicons/icons';
   ],
 })
 export class LandingPage {
-  constructor() {}
+  constructor() {
+      addIcons({leafOutline,logInOutline,personAddOutline});}
 
   // Icons
   leafIcon = leafOutline;

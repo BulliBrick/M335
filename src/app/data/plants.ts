@@ -6,5 +6,4 @@ export interface Plant {
     location_in_garden: string;
     care_instructions: string;
     notes: string;
-    picture_url: string;
 }

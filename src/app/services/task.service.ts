@@ -1,6 +1,8 @@
 import { Task } from '../data/tasks';
 import { supabase } from './supabase.config';
+import { Injectable } from '@angular/core';
 
+@Injectable({ providedIn: 'root' })
 export class TaskService {
   private readonly TABLE_NAME = 'tasks';
 

@@ -4,6 +4,8 @@ import { GardensService } from '../../services/garden.service';
 import { WeatherService } from '../../services/weather.service';
 import { NetworkService } from '../../services/network.service';
 import { Garden } from '../../data/gardens';
+import { WeatherComponent } from '../../components/weather/weather-map.page';
+import { WeatherResponse } from '../../interfaces/weather.interfaces';
 import { 
   IonContent, 
   IonHeader, 
@@ -16,18 +18,9 @@ import {
   IonButton, 
   IonIcon 
 } from '@ionic/angular/standalone';
-import { CommonModule } from '@angular/common';
-
-interface WeatherData {
-  location: string;
-  temp: number;
-  condition: string;
-  forecast: Array<{
-    date: string;
-    temp: number;
-    condition: string;
-  }>;
-}
+import { CommonModule, NgFor, NgIf } from '@angular/common';
+import { addOutline, cloudOfflineOutline, leafOutline, logInOutline, personAddOutline } from 'ionicons/icons';
+import { addIcons } from 'ionicons';
 
 @Component({
   selector: 'app-dashboard',
@@ -45,21 +38,25 @@ interface WeatherData {
     IonCardContent,
     IonButton,
     IonIcon,
-    CommonModule
+    CommonModule,
+    WeatherComponent,
+    NgIf,
+    NgFor,
+    
   ]
 })
 export class DashboardComponent implements OnInit {
   gardens: Garden[] = [];
-  weatherData: WeatherData | null = null;
   isWeatherExpanded = false;
   isOnline = true;
 
   constructor(
     private router: Router,
     private gardensService: GardensService,
-    private weatherService: WeatherService,
     private networkService: NetworkService
-  ) {}
+  ) {
+    addIcons({leafOutline,cloudOfflineOutline,personAddOutline});
+  }
 
   ngOnInit() {
     this.setupNetworkListener();
@@ -70,7 +67,6 @@ export class DashboardComponent implements OnInit {
     this.networkService.onNetworkChange().subscribe(isOnline => {
       this.isOnline = isOnline;
       if (isOnline) {
-        this.loadWeatherData();
         this.gardensService.syncGardens();
       }
     });
@@ -79,7 +75,6 @@ export class DashboardComponent implements OnInit {
   private async loadInitialData() {
     await this.loadGardens();
     if (this.isOnline) {
-      await this.loadWeatherData();
     }
   }
 
@@ -87,16 +82,6 @@ export class DashboardComponent implements OnInit {
     this.gardens = await this.gardensService.getGardens();
   }
 
-  private async loadWeatherData() {
-    try {
-      // Switzerland coordinates as default
-      const lat = 47.3769;
-      const lon = 8.5417;
-      this.weatherData = await this.weatherService.getWeatherData(lat, lon);
-    } catch (error) {
-      console.error('Weather data loading failed:', error);
-    }
-  }
 
   toggleWeather() {
     if (this.isOnline) {

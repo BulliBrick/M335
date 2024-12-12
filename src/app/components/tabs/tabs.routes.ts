@@ -12,9 +12,14 @@ export const routes: Routes = [
           import('../../pages/dashboard/dashboard.page').then((m) => m.DashboardComponent),
       },
       {
-        path: 'tab2',
+        path: 'planner:id',
         loadComponent: () =>
-          import('../../pages/planner/planner.page').then((m) => m.Tab2Page),
+          import('../../pages/planner/planner.page').then((m) => m.PlannerPage),
+      },
+      {
+        path: 'planner',
+        loadComponent: () =>
+          import('../../pages/planner/garden-select.page').then((m) => m.GardenSelectPage),
       },
       {
         path: 'tab3',

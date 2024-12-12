@@ -1,0 +1,78 @@
+<!-- components/plants-details/plants-details.page.html -->
+<ion-header>
+    <ion-toolbar>
+      <ion-title>{{ isNewPlant ? 'Add Plant' : 'Plant Details' }}</ion-title>
+      <ion-buttons slot="start">
+        <ion-button (click)="dismiss()">Cancel</ion-button>
+      </ion-buttons>
+      <ion-buttons slot="end">
+        <ion-button (click)="savePlant()" [strong]="true">Save</ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
+  
+  <ion-content class="ion-padding">
+    <ng-container *ngIf="isNewPlant">
+      <!-- Option to add existing plant -->
+      <ion-item>
+        <ion-label position="stacked">Add Existing Plant</ion-label>
+        <ion-select placeholder="Select existing plant" (ionChange)="addExistingPlant($event.detail.value)">
+          <ion-select-option *ngFor="let plant of existingPlants" [value]="plant">
+            {{plant.name}} ({{plant.species}})
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+  
+      <div class="ion-padding-vertical">
+        <ion-text color="medium">Or create a new plant:</ion-text>
+      </div>
+    </ng-container>
+  
+    <!-- Plant details form -->
+    <ion-list>
+      <ion-item>
+        <ion-label position="stacked">Name</ion-label>
+        <ion-input type="text" [(ngModel)]="editedPlant.name" required></ion-input>
+      </ion-item>
+  
+      <ion-item>
+        <ion-label position="stacked">Species</ion-label>
+        <ion-input type="text" [(ngModel)]="editedPlant.species" required></ion-input>
+      </ion-item>
+  
+      <ion-item>
+        <ion-label position="stacked">Location in Garden</ion-label>
+        <ion-input type="text" [(ngModel)]="editedPlant.location_in_garden" required></ion-input>
+      </ion-item>
+  
+      <ion-item>
+        <ion-label position="stacked">Care Instructions</ion-label>
+        <ion-textarea
+          [(ngModel)]="editedPlant.care_instructions"
+          rows="4"
+          placeholder="Enter care instructions..."
+        ></ion-textarea>
+      </ion-item>
+  
+      <ion-item>
+        <ion-label position="stacked">Notes</ion-label>
+        <ion-textarea
+          [(ngModel)]="editedPlant.notes"
+          rows="4"
+          placeholder="Enter any additional notes..."
+        ></ion-textarea>
+      </ion-item>
+    </ion-list>
+  
+    <!-- Remove plant button (only show for existing plants) -->
+    <div class="ion-padding" *ngIf="!isNewPlant">
+      <ion-button 
+        expand="block" 
+        color="danger" 
+        fill="outline"
+        (click)="removePlantFromGarden()"
+      >
+        Remove from Garden
+      </ion-button>
+    </div>
+  </ion-content>

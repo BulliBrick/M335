@@ -1,0 +1,77 @@
+.planner-container {
+    padding: 16px;
+    
+    .segment-container {
+      margin-bottom: 20px;
+    }
+  
+    .header {
+      margin-bottom: 20px;
+      
+      h2 {
+        font-size: 24px;
+        font-weight: 600;
+        color: var(--ion-color-dark);
+        margin: 0;
+      }
+    }
+  
+    .tasks-list,
+    .plants-list {
+      display: grid;
+      gap: 16px;
+      margin-bottom: 20px;
+  
+      ion-card {
+        margin: 0;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+  
+        &:hover {
+          transform: translateY(-2px);
+        }
+      }
+    }
+  
+    .task-date {
+      color: var(--ion-color-medium);
+      font-size: 0.9em;
+      margin-top: 8px;
+      text-align: right;
+    }
+  
+    .no-items {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      text-align: center;
+  
+      ion-icon {
+        font-size: 48px;
+        color: var(--ion-color-medium);
+        margin-bottom: 16px;
+      }
+  
+      p {
+        color: var(--ion-color-medium);
+        margin-bottom: 20px;
+      }
+    }
+  }
+  
+  // Responsive grid adjustments
+  @media (min-width: 768px) {
+    .tasks-list,
+    .plants-list {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .tasks-list,
+    .plants-list {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }

@@ -1,6 +1,8 @@
 import { GardenLog } from '../data/garden_logs';
 import { supabase } from './supabase.config';
+import { Injectable } from '@angular/core';
 
+@Injectable({ providedIn: 'root' })
 export class GardenLogService {
   private readonly TABLE_NAME = 'garden_logs';
 

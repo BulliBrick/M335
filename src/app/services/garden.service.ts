@@ -2,14 +2,14 @@
 import { Injectable } from '@angular/core';
 import { Storage } from '@ionic/storage-angular';
 import { NetworkService } from './network.service';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { Garden } from '../data/gardens';
+import { supabase } from './supabase.config';
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class GardensService {
-  private supabase: SupabaseClient;
   private storage: Storage | null = null;
   private STORAGE_KEY = 'gardens';
 
@@ -18,10 +18,7 @@ export class GardensService {
     private networkService: NetworkService
   ) {
     this.initStorage();
-    this.supabase = createClient(
-      'YOUR_SUPABASE_URL',
-      'YOUR_SUPABASE_KEY'
-    );
+    
   }
 
   private async initStorage() {
@@ -33,7 +30,7 @@ export class GardensService {
     return await this.storage?.get(this.STORAGE_KEY) || [];
   }
 
-  async addGarden(garden: Garden): Promise<void> {
+  public async addGarden(garden: Garden): Promise<void> {
     const gardens = await this.getGardens();
     gardens.push(garden);
     await this.storage?.set(this.STORAGE_KEY, gardens);
@@ -62,7 +59,7 @@ export class GardensService {
     await this.storage?.set(this.STORAGE_KEY, filteredGardens);
     
     if (await this.networkService.isOnline()) {
-      await this.supabase
+      await supabase
         .from('gardens')
         .delete()
         .match({ id: gardenId });
@@ -77,7 +74,7 @@ export class GardensService {
       const localGardens = await this.getGardens();
       
       // Get remote gardens
-      const { data: remoteGardens, error } = await this.supabase
+      const { data: remoteGardens, error } = await supabase
         .from('gardens')
         .select('*');
 
@@ -100,7 +97,7 @@ export class GardensService {
 
   private async syncGarden(garden: Garden): Promise<void> {
     try {
-      const { error } = await this.supabase
+      const { error } = await supabase
         .from('gardens')
         .upsert({
           id: garden.id,
@@ -118,7 +115,7 @@ export class GardensService {
   }
 
   private async syncLocalToRemote(gardens: Garden[]): Promise<void> {
-    const { error } = await this.supabase
+    const { error } = await supabase
       .from('gardens')
       .upsert(gardens.map(garden => ({
         id: garden.id,
