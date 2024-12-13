@@ -1,6 +1,36 @@
 {
     "appId": "m335",
-    "appName": "m335",
+    "appName": "Urban Garden Planner",
     "webDir": "www",
-    "bundledWebRuntime" : false
+    "plugins": {
+        "SplashScreen": {
+            "launchShowDuration": 2000,
+            "launchAutoHide": true,
+            "backgroundColor": "#3880ff",
+            "androidSplashResourceName": "splash",
+            "androidScaleType": "CENTER_CROP",
+            "showSpinner": true,
+            "androidSpinnerStyle": "large",
+            "spinnerColor": "#ffffff",
+            "splashFullScreen": true,
+            "splashImmersive": true
+        },
+        "Geolocation": {
+            "permissions": [
+                "location",
+                "coarseLocation"
+            ]
+        }
+    },
+    "server": {
+        "cleartext": true,
+        "allowNavigation": [
+            "*.google.com",
+            "*.googleapis.com"
+        ]
+    },
+    "assets": {
+        "source": "resources",
+        "outputPath": "android/app/src/main/res"
+    }
 }

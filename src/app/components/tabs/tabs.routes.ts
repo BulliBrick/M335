@@ -12,7 +12,7 @@ export const routes: Routes = [
           import('../../pages/dashboard/dashboard.page').then((m) => m.DashboardComponent),
       },
       {
-        path: 'planner:id',
+        path: 'planner/:id',
         loadComponent: () =>
           import('../../pages/planner/planner.page').then((m) => m.PlannerPage),
       },

@@ -5,21 +5,23 @@ import { WeatherService } from '../../services/weather.service';
 import { NetworkService } from '../../services/network.service';
 import { Garden } from '../../data/gardens';
 import { WeatherResponse } from '../../interfaces/weather.interfaces';
-import { 
-  IonContent, 
-  IonHeader, 
-  IonTitle, 
-  IonToolbar, 
-  IonCard, 
-  IonCardHeader, 
-  IonCardTitle, 
-  IonCardContent, 
-  IonButton, 
-  IonIcon 
+import {
+  IonContent,
+  IonHeader,
+  IonTitle,
+  IonToolbar,
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardContent,
+  IonButton,
+  IonIcon,
+  AlertController
 } from '@ionic/angular/standalone';
 import { CommonModule, NgFor, NgIf } from '@angular/common';
-import { addOutline, cloudOfflineOutline, leafOutline, logInOutline, personAddOutline, water, speedometer, sunny, rainy, warning } from 'ionicons/icons';
+import { addOutline, cloudOfflineOutline, leafOutline, logInOutline, personAddOutline, water, speedometer, sunny, rainy, warning, location } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
+import { Geolocation } from '@capacitor/geolocation';
 import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-dashboard',
@@ -42,27 +44,75 @@ import { FormsModule } from '@angular/forms';
     NgFor,
     FormsModule,
     
-    
-  ],
+  ]
 })
 export class DashboardComponent implements OnInit {
   gardens: Garden[] = [];
   isWeatherExpanded = false;
   isOnline = true;
-  weatherData: WeatherResponse | null = null;  
+  weatherData: WeatherResponse | null = null;
   constructor(
     private router: Router,
     private gardensService: GardensService,
+     private weatherService: WeatherService,
     private networkService: NetworkService,
-    private weatherService: WeatherService
+    private alertCtrl: AlertController,
   ) {
-    addIcons({leafOutline,water,speedometer,sunny,rainy,warning,cloudOfflineOutline,personAddOutline});
+    addIcons({leafOutline,water,speedometer,rainy,location,sunny,warning,cloudOfflineOutline,personAddOutline});
   }
 
   ngOnInit() {
     this.setupNetworkListener();
     this.loadInitialData();
     this.loadWeatherData();
+    const coordinates = Geolocation.getCurrentPosition();
+    console.log(coordinates)
+  }
+
+  async openNewGardenDialog() {
+    const alert = await this.alertCtrl.create({
+      header: 'New Garden',
+      inputs: [
+        {
+          name: 'name',
+          type: 'text',
+          placeholder: 'Garden Name'
+        },
+        {
+          name: 'location',
+          type: 'text',
+          placeholder: 'Location'
+        },
+        {
+          name: 'size',
+          type: 'text',
+          placeholder: 'Size (e.g., 10x20m)'
+        }
+      ],
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel'
+        },
+        {
+          text: 'Create',
+          handler: async (data) => {
+            const newGarden: Garden = {
+              id: Date.now(),
+              name: data.name,
+              location: data.location,
+              size: data.size,
+              created_at: new Date().toISOString()
+            };
+            
+            await this.gardensService.addGarden(newGarden);
+            await this.loadGardens();
+          }
+        }
+      ]
+    });
+
+    await alert.present();
   }
 
   private setupNetworkListener() {
@@ -92,27 +142,34 @@ export class DashboardComponent implements OnInit {
   }
 
   async createNewGarden() {
-    this.router.navigate(['/create-garden']);
+    this.router.navigate(['/planner']);
   }
 
   openGarden(gardenId: number) {
-    this.router.navigate(['/garden-planner', gardenId]);
+    this.router.navigate([`/planner:${gardenId}`]);
   }
-  loadWeatherData() {
-    // Use Switzerland coordinates or get from user's garden location
-    const lat = 46.8182;
-    const lon = 8.2275;
 
-    this.weatherService.getWeatherData(lat, lon).subscribe(
-      data => {
-        this.weatherData = data;
-      },
-      error => {
-        console.error('Error loading weather data:', error);
-      }
-    );
+ public async loadWeatherData() {
+    try {
+      const position = await this.weatherService.getPosition();
+      this.weatherService.getForecast(
+        position.coords.latitude,
+        position.coords.longitude
+      ).subscribe({
+        next: (data) => {
+          this.weatherData = data;
+          console.log('Weather data:', data);
+        },
+        error: (error) => {
+          console.error('Error fetching weather data:', error);
+        }
+      });
+    } catch (error) {
+      console.error('Error getting location:', error);
+      this.weatherService.getForecast(49.5,8.0)
+    }
   }
-  
+
   getWeatherIcon(conditions: string): string {
     switch (conditions.toLowerCase()) {
       case 'clear':
@@ -127,7 +184,7 @@ export class DashboardComponent implements OnInit {
         return 'thermometer';
     }
   }
-  
+
   getDayLabel(date: string): string {
     const today = new Date().toLocaleDateString();
     if (date === today) {

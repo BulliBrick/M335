@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, UrlSegment } from '@angular/router';
 import { Task } from '../../data/tasks';
 import { Plant } from '../../data/plants';
 import { PlantsInGarden } from '../../data/plants_in_garden';
@@ -9,6 +9,7 @@ import { PlantsInGardenService } from '../../services/plants-in-garden.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Garden } from '../../data/gardens';
 import { 
   AlertController, 
   ModalController,
@@ -93,8 +94,11 @@ export class PlannerPage implements OnInit {
   }
 
   async loadPlants() {
+    console.log(this.gardenId)
+    
     if (this.gardenId !== undefined) {
       this.plantsInGarden = await this.plantsInGardenService.getPlantsInGarden(this.gardenId);
+      console.log("loadplants")
       const plantsArray = await Promise.all(
         this.plantsInGarden.map(pig => this.plantService.getPlantById(pig.plant_id))
       );
@@ -156,8 +160,8 @@ export class PlannerPage implements OnInit {
   }
 
   async saveTask(data: any) {
-    if (this.gardenId === undefined) {
-      throw new Error('Garden ID is undefined');
+    if (this.gardenId === null || this.gardenId === undefined) {
+      throw new Error('Garden ID is null');
     }
 
     const newTask: Task = {

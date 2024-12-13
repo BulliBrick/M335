@@ -6,10 +6,12 @@ import { Injectable } from '@angular/core';
 export class PlantsInGardenService {
   private readonly TABLE_NAME = 'Plants_in_Garden';
 
-  async addPlantToGarden(plantInGarden: Omit<PlantsInGarden, 'id'>): Promise<PlantsInGarden | null> {
+  async addPlantToGarden(plantInGarden: PlantsInGarden): Promise<PlantsInGarden | null> {
+    const { plant_id, garden_id } = plantInGarden
+    
     const { data, error } = await supabase
       .from(this.TABLE_NAME)
-      .insert(plantInGarden)
+      .insert({plant_id,garden_id})
       .select()
       .single();
     

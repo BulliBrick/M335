@@ -4,12 +4,13 @@ import { Injectable } from '@angular/core';
 
 @Injectable({ providedIn: 'root' })
 export class PlantService {
-  private readonly TABLE_NAME = 'plants';
+  private readonly TABLE_NAME = 'Plants';
 
-  async createPlant(plant: Omit<Plant, 'id'>): Promise<Plant | null> {
+  async createPlant(plant: Plant): Promise<Plant | null> {
+    const {id, ...obj} = plant
     const { data, error } = await supabase
       .from(this.TABLE_NAME)
-      .insert(plant)
+      .insert(obj)
       .select()
       .single();
     
@@ -23,7 +24,7 @@ export class PlantService {
       .select('*');
     
     if (error) throw error;
-    return data || [];
+    return data || []; 
   }
 
   async getPlantById(id: number): Promise<Plant | null> {

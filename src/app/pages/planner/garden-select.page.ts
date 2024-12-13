@@ -152,7 +152,7 @@ export class GardenSelectPage implements OnInit {
   }
 
   selectGarden(garden: Garden) {
-    this.router.navigate(['/tabs/planner', garden.id]);
+    this.router.navigate([`tabs/planner/${garden.id}`]);
   }
 
   async openNewGardenDialog() {
